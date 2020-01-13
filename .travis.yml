@@ -1,22 +1,23 @@
-language: generic
 sudo: required
 services:
   - docker
-
 before_install:
-  - docker build -t jwu/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t jwu/react-test -f ./client/dev.Dockerfile ./client
 
 script:
   - docker run -e CI=true jwu/react-test npm test
 
 after_success:
-  - dcoker build -t jwu/multi-client ./client
-  - dcoker build -t jwu/multi-nginx ./nginx
-  - dcoker build -t jwu/multi-server ./server
-  - dcoker build -t jwu/multi-worker ./worker
-
+  - docker build -t jwu/multi-client ./client
+  - docker build -t jwu/multi-nginx ./nginx
+  - docker build -t jwu/multi-server ./server
+  - docker build -t jwu/multi-worker ./worker
+# log in docker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+
+  # Take images push it to docker-hub
   - docker push jwu/multi-client
-  - docker push jwu/multi-nginx
+  - docker push jwu/multi-nginx 
   - docker push jwu/multi-server
   - docker push jwu/multi-worker
