@@ -1,0 +1,21 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t jwu/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run jwu/react-test npm test -- --coverage
+
+after_success:
+  - dcoker build -t jwu/multi-client ./client
+  - dcoker build -t jwu/multi-nginx ./nginx
+  - dcoker build -t jwu/multi-server ./server
+  - dcoker build -t jwu/multi-worker ./worker
+
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push jwu/multi-client
+  - docker push jwu/multi-nginx
+  - docker push jwu/multi-server
+  - docker push jwu/multi-worker
